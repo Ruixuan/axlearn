@@ -61,8 +61,8 @@ MAX_SEQUENCE_LENGTH = {
     Version.V3: 8192,
 }
 
-TRN_MODEL_AXIS_SIZE=8
-GRADIENT_ACCUMULATION_MICROBATCHES=8
+TRN_MODEL_AXIS_SIZE=32
+GRADIENT_ACCUMULATION_MICROBATCHES=1
 
 ROPE_THETA = {
     Version.V1: 1e4,
@@ -148,7 +148,7 @@ def get_trainer_kwargs(
     elif model_size == "7B":
         trainer_kwargs = dict(
             model_kwargs=dict(
-                num_layers=32,
+                num_layers=16,
                 hidden_dim=128 * 32,
                 ffn_dim = scaled_hidden_dim(scale=8 / 3, round_up_to_multiples_of=256),
                 num_heads=32,
