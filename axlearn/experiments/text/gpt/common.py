@@ -323,6 +323,9 @@ def model_config(
         seq_axis_names="seq",
     )
     cfg.decoder.logits_partition_spec = (batch_axis_names, "seq", "model")
+    tp_axis_names='model'
+    fsdp_axis_names='data'
+    cfg.decoder.emb.token_emb.param_partition_spec = (tp_axis_names, fsdp_axis_names) # shard vocab
     set_bias_recursively(cfg, False)
     set_norm_recursively(cfg, normalization)
     cfg.z_loss_scale = z_loss_scale
