@@ -299,8 +299,6 @@ def learner_config(
     b1: float = 0.9,
     b2: float = 0.95,
     eps: float = 1e-8,
-    gradient_accumulation_microbatches: int = 1,
-    metrics_accumulation_key_ops: Dict = {}
 ) -> learner.Learner.Config:
     """Build learner using the AdamW optimizer and a cosine lr schedule with linear warmup."""
     update_schedule = config_for_function(schedule.cosine_with_linear_warmup).set(
@@ -323,14 +321,13 @@ def learner_config(
                 weight_decay=weight_decay,
                 weight_decay_per_param_scale=None,
                 adam_update_transformation=None,
+                # to be removed and tested
                 mu_dtype=jnp.float32,
             ),
         ]
     )
-    if gradient_accumulation_microbatches > 1:
-        return learner.AccumulatedLearner.default_config().set(optimizer=optimizer_cfg, microbatches=gradient_accumulation_microbatches, metrics_accumulation_key_ops=metrics_accumulation_key_ops)
-    else:
-        return learner.Learner.default_config().set(optimizer=optimizer_cfg)
+
+    return learner.Learner.default_config().set(optimizer=optimizer_cfg)
 
 
 def tfds_read_config() -> InstantiableConfig:
