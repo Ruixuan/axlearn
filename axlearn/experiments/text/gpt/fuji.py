@@ -25,6 +25,7 @@ from axlearn.common.attention import (
     GroupedQueryAttention,
     MultiheadAttention,
     RepeatedTransformerLayer,
+    StackedTransformerLayer,
     RoFormerQKVLinear,
 )
 from axlearn.common.base_layer import RematSpec
@@ -155,8 +156,9 @@ def get_trainer_kwargs(
         trainer_kwargs = dict(
             model_kwargs=dict(
                 num_layers=2,
-                hidden_dim=128 * 32,
+                hidden_dim=128*32,
                 num_heads=32,
+                stack_cfg=StackedTransformerLayer.default_config(),
                 num_kv_heads=num_kv_heads,
                 rope_theta=rope_theta,
                 flash_attention=flash_attention,
@@ -243,6 +245,11 @@ def get_trainer_kwargs(
                 (
                     "gpu-(p5.48xlarge|p4de.24xlarge|a3-highgpu-8g)-(256|512|1024)",
                     mesh_shape_from_axes(data=-1, fsdp=8),
+                ),
+                # Trainium 1 configs, only model parallel supported
+                (   
+                    "neuron-(trn1.32xlarge|trn1n.32xlarge)-(32|64|256|512|1024|2048)",
+                    mesh_shape_from_axes(data=-1, model=32),
                 ),
             ),
         )
