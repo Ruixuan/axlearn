@@ -148,7 +148,7 @@ def get_trainer_kwargs(
     elif model_size == "7B":
         trainer_kwargs = dict(
             model_kwargs=dict(
-                num_layers=16,
+                num_layers=2,
                 hidden_dim=128 * 32,
                 ffn_dim = scaled_hidden_dim(scale=8 / 3, round_up_to_multiples_of=256),
                 num_heads=32,
