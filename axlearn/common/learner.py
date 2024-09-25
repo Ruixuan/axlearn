@@ -96,7 +96,8 @@ def _prune_empty(in_tree: NestedTensor) -> NestedTensor:
 
 
 
-class ForwardOutputs(NamedTuple):
+@dataclasses.dataclass
+class ForwardOutputs:
     loss: Tensor
     aux: NestedTensor
     output_collection: OutputCollection
