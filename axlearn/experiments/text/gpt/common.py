@@ -505,7 +505,6 @@ def get_trainer_config_fn(
     train_batch_size: int,
     mesh_shape: Sequence[int],
     train_input_source: InstantiableConfig[input_tf_data.BuildDatasetFn],
-    input_partition_type: DataPartitionType,
     evalers: Dict[str, SpmdEvaler.Config],
     mesh_axis_names: Sequence[str] = MESH_AXIS_NAMES,
     mesh_rules: Optional[Sequence[Tuple[str, Optional[MeshShape]]]] = None,
@@ -558,7 +557,6 @@ def get_trainer_config_fn(
                 pad_example_fn=input_tf_data.default_pad_example_fn,
             ),
         )
-        cfg.input_partition_type = input_partition_type
         cfg.evalers = {}
         for name, evaler_cfg in evalers.items():
             evaler_cfg.input.batcher.set(global_batch_size=eval_batch_size or train_batch_size)

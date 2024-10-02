@@ -43,7 +43,6 @@ from axlearn.common.utils import (
     NestedPartitionSpec,
     NestedTensor,
     PartitionSpec,
-    DataPartitionType,
     Tensor,
     count_model_params,
     flatten_items,
@@ -152,9 +151,6 @@ class SpmdTrainer(Module):
 
         # An optional recorder for measuring common metrics like step time.
         recorder: Optional[InstantiableConfig[measurement.Recorder]] = None
-        # The input partition:
-        # Options: FULL (default), DATA, REPLICATED
-        input_partition_type: Required[DataPartitionType] = DataPartitionType.DATA
 
     def __init__(
         self,
@@ -171,7 +167,6 @@ class SpmdTrainer(Module):
                 "Setting prune_empty_state_updates to False is no longer supported.\n"
                 "The config option will be removed in a future AXLearn version."
             )
-
         self._step: int = None
         self._trainer_state: TrainerState = None
         self._jit_train_step: jax.stages.Wrapped = None
@@ -273,7 +268,7 @@ class SpmdTrainer(Module):
 
     def _train_step_input_partition_specs(self):
         # By default, each input tensor is fully partitioned along the batch axis.
-        return utils.input_partition_spec(self.config.input_partition_type)
+        return utils.input_partition_spec()
 
     def model_params_for_eval(self):
         state = self.trainer_state
@@ -443,7 +438,7 @@ class SpmdTrainer(Module):
                     self._step = self._step + 1
                     self.vlog(3, "Start step %s", self.step)
                     output = self._run_step(
-                        utils.host_to_global_device_array(input_batch, partition=cfg.input_partition_type),
+                        utils.host_to_global_device_array(input_batch),
                         force_run_evals=force_run_eval_sets_at_max_step
                         if self.step >= cfg.max_step
                         else None,

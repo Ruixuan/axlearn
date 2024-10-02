@@ -135,7 +135,6 @@ def get_trainer_kwargs(
                 peak_lr=6e-4,
                 weight_decay=0.01,
             ),
-            input_partition_type=DataPartitionType.DATA,
             max_sequence_length=64,
             train_batch_size=32,
             max_step=3000,
@@ -156,7 +155,6 @@ def get_trainer_kwargs(
                 flash_attention=flash_attention,
             ),
             learner_kwargs=dict(peak_lr=3e-4, weight_decay=0.1),
-            input_partition_type=DataPartitionType.DATA,
             # 1 batch per DP replica
             train_batch_size=int((jax.device_count()/TRN_MODEL_AXIS_SIZE)*GRADIENT_ACCUMULATION_MICROBATCHES),
             max_sequence_length=max_sequence_length,
@@ -205,7 +203,6 @@ def get_trainer_kwargs(
             ),
             learner_kwargs=dict(peak_lr=1.5e-4, weight_decay=0.1),
             max_sequence_length=max_sequence_length,
-            input_partition_type=DataPartitionType.DATA,
             train_batch_size=train_batch_size,
             max_step=max_step,
             mesh_shape=mesh_shape_from_axes(fsdp=-1),
