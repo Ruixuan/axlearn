@@ -46,7 +46,6 @@ from axlearn.common.utils import (
     input_partition_spec,
     replicate_to_local_data,
     with_sharding_constraint,
-    DataPartitionType,
 )
 
 
@@ -198,11 +197,11 @@ class BaseMetricCalculator(Module):
             in_shardings=(
                 self._model_param_partition_specs,  # model_params.
                 None,  # replicated_inputs (e.g., prng_key).
-                utils.input_partition_spec(DataPartitionType.DATA),  # per_example_inputs.
+                utils.input_partition_spec(),  # per_example_inputs.
             ),
             out_shardings=dict(
                 replicated=None,
-                per_example=utils.input_partition_spec(DataPartitionType.DATA),
+                per_example=utils.input_partition_spec(),
             ),
         )
 
@@ -686,7 +685,7 @@ class SpmdEvaler(Module):
 
             with jax.profiler.StepTraceAnnotation(cfg.name, step_num=step):
                 with jax.profiler.TraceAnnotation(f"{cfg.name}.forward"):
-                    global_input_batch = utils.host_to_global_device_array(input_batch, partition=DataPartitionType.DATA)
+                    global_input_batch = utils.host_to_global_device_array(input_batch)
                     forward_outputs = self.metric_calculator.forward(
                         global_input_batch,
                         model_params=model_params,
@@ -858,7 +857,7 @@ class GlobalMetricCalculator(BaseMetricCalculator):
         # node will be set as None.
         concatenated_outputs = jax.tree_util.tree_map(
             lambda xs: with_sharding_constraint(
-                jnp.reshape(xs, (-1, *xs.shape[2:])), input_partition_spec(DataPartitionType.DATA)
+                jnp.reshape(xs, (-1, *xs.shape[2:])), input_partition_spec()
             )
             if all(dim > 0 for dim in xs.shape[2:])
             else None,
